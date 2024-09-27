@@ -191,26 +191,24 @@ class Secuencia(Secuenciable):
         else:
             print("El elemento no se encuentra en la secuencia\n")
 
-    def eliminar2(self, elemento: T, nrep: int):
-        if nrep <= self.repeticiones(elemento):
-            apariciones_eliminadas = 0
-            while apariciones_eliminadas < nrep and self.__nd > 0:
-                it = iter(self)
-                indice = 0
-                try:
-                    while True:
-                        libro = next(it)
-                        if libro == elemento:
-                            for j in range(indice, self.__nd - 1):
-                                self.__datos[j] = self.__datos[j + 1]
-                            self.__nd -= 1
-                            apariciones_eliminadas += 1
-                            break
-                        indice += 1
-                except StopIteration:
-                    pass
-        else:
-            print(f"El elemento no se encuentra en la secuencia al menos {nrep} veces\n")
+    def eliminar_libro(self, elemento: T):
+        if self.contiene(elemento):
+            pos = self.__encuentra(elemento)
+            if pos is not None:
+                # Desplazar los elementos a la izquierda para eliminar el elemento
+                for i in range(pos, self.__nd - 1):
+                    self.__datos[i] = self.__datos[i + 1]
+                self.__nd -= 1
+                self.__datos[self.__nd] = None  # Opcional: marcar la posición como vacía
+
+    def eliminar2(self, elemento: T, nveces: int):
+        if not self.contiene(elemento) or nveces <= 0:
+            return
+
+        eliminados = 0
+        while eliminados < nveces and self.contiene(elemento):
+            self.eliminar_libro(elemento)
+            eliminados += 1
 
     def esta_vacia(self) -> bool:
         """
