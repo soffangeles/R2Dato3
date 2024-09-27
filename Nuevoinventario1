@@ -74,7 +74,7 @@ if __name__ == "__main__":
     if num_libros > 1000000:
         print("El número de libros es demasiado grande. Introduce un número menor a 1000000.")
         num_libros = int(input("¿Cuántos libros deseas agregar? "))
-        
+
     """
 
     # Colocamos la instancia de la clase Secuencia
@@ -190,7 +190,7 @@ if __name__ == "__main__":
             # Muestra un mensaje de confirmación
             print(f"{libro.titulo} ha sido agregado a la biblioteca")
 
-                # Agregar varios ejemplares de un libro al inventario
+            # Agregar varios ejemplares de un libro al inventario
         elif opcion == "2":
             """
             Agrega varios ejemplares de un libro al inventario. Solicita al usuario la
@@ -492,32 +492,59 @@ if __name__ == "__main__":
                 # Si el inventario está vacío, muestra un mensaje indicandolo
                 print("El inventario está vacío")
 
-                # Eliminar un elemento de la secuencia una cierta cantidad de veces.
+        # Eliminar un elemento de la secuencia una cierta cantidad de veces.
         elif opcion == "6":
             if not secuencia.esta_vacia():
-                titulo = input("Escribe el título del libro que deseas eliminar: ")
-                autor = input("Escribe el autor del libro que deseas eliminar: ")
-                genero = input("Escribe el género del libro que deseas eliminar: ")
-                ISBN = input("Escribe el ISBN del libro que deseas eliminar: ")
-                while not (len(ISBN) == 13 and ISBN.replace("-", "").isdigit() and
-                           (ISBN[:3] == "978" or ISBN[:3] == "979")):
+                print("Ingresa los siguientes datos del libro a eliminar:\n")
+
+                # Solicita al usuario el título del libro que desea eliminar.
+                titulo = input("Escribe el título del libro: ")
+
+                # Solicita el nombre del autor
+                autor = input("Escribe el autor del libro: ")
+
+                # Solicita el género del libro
+                genero = input("Escribe el género del libro: ")
+
+                # Solicita el ISBN y válida que tenga el formato correcto
+                ISBN = input("Escribe el ISBN del libro: ")
+                while not (len(ISBN) == 13 and ISBN.replace("-", "").isdigit() and (
+                        ISBN[:3] == "978" or ISBN[:3] == "979")):
                     print("El ISBN es incorrecto, por favor ingresa uno valido (13 dígitos, 978- o 979-)")
                     ISBN = input("Escribe el ISBN del libro: ")
-                publicacion = int(input("Escribe el año de publicación del libro que deseas eliminar: "))
-                editorial = input("Escribe la editorial del libro que deseas eliminar: ")
-                edicion = int(input("Escribe la edición del libro que deseas eliminar: "))
-                pags = int(input("Escribe el número de páginas del libro que deseas eliminar: "))
 
-                libro_eliminar = Libro(titulo, autor, genero, ISBN, publicacion, editorial, edicion, pags)
+                # Solicita el año de publicación
+                publicacion = input("Escribe el año de publicación del libro: ")
 
-                if secuencia.contiene(libro_eliminar):
-                    nrep = int(input("¿Cuántas veces deseas eliminar el libro del inventario?: "))
-                    secuencia.eliminar2(libro_eliminar, nrep)
-                    print(f"El libro {libro_eliminar.titulo} fue eliminado {nrep} vez/veces del inventario.")
-                else:
-                    print("El libro no se encuentra en el inventario.")
+                # Solicita la editorial del libro
+                editorial = input("Escribe la editorial del libro: ")
+
+                # Solicita el número de edición
+                edicion = int(input("Escribe la edición del libro: "))
+
+                # Solicita el número de páginas
+                pags = int(input("Escribe el número de páginas del libro: "))
+
+                # Crea una instancia de la clase Libro
+                libro = Libro(titulo, autor, genero, ISBN, publicacion, editorial, edicion, pags)
+
+                # Solicita el número de ejemplares a eliminar y valida que sea un entero positivo
+                while True:
+                    try:
+                        ejemplar = int(input("Ingresa el número de ejemplares que quieres eliminar: "))
+                        if ejemplar <= 0:
+                            raise ValueError
+                        break
+                    except ValueError:
+                        print("Ingresa un valor entero positivo para el número de ejemplares a eliminar")
+
+                # Elimina los ejemplares del inventario (utilizando el nuevo eliminar2 con iteradores)
+                secuencia.eliminar2(libro, ejemplar)
+
+                # Muestra un mensaje de confirmación
+                print(f"Se han eliminado {ejemplar} copias de {libro.titulo} de la biblioteca")
             else:
-                print("El inventario está vacío.")
+                print("El inventario está vacío. No se puede eliminar ningún libro.\n")
 
         # Verificar si el inventario está vacío.
         elif opcion == "7":
@@ -548,7 +575,7 @@ if __name__ == "__main__":
             # Se imprime un mensaje confirmando que se han eliminado los elementos
             print("El inventario ahora está vacío")
 
-                # Listar todos los libros existentes en el inventario sin orden
+            # Listar todos los libros existentes en el inventario sin orden
         elif opcion == "10":
             # Verifica si el inventario no está vacío
             if not secuencia.esta_vacia():
@@ -698,15 +725,15 @@ if __name__ == "__main__":
                     # imprimimos la ficha bibliográfica del libro solicitado
                     print(libro)
 
-        #Crea un archivo de tipo .csv con todos los libros agregados durante la ejecución del programa.
+        # Crea un archivo de tipo .csv con todos los libros agregados durante la ejecución del programa.
         elif opcion == "16":
             nombre_archivo = input("Introduce el nombre del archivo CSV para guardar el inventario: ")
             secuencia.guardar_en_csv(nombre_archivo)
             print(f"Inventario guardado en {nombre_archivo}")
 
         # Salir del programa
-        elif  opcion == "17":
-            print("Haz decidido salir del programa")
+        elif opcion == "17":
+            print("Has decidido salir del programa")
             print("¡Hasta pronto!")
             exit()
 
