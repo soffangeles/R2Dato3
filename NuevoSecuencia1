@@ -125,24 +125,11 @@ class Secuencia(Secuenciable):
         return False
 
     def repeticiones(self, elemento: T) -> int:
-        """
-        Método que nos indica el número de veces que se repite un elemento dentro de la sucesión
-        :param elemento: El elemento a buscar
-        :return: El número de veces que se repite
-        """
-        if self.contiene(elemento):
-            it1 = iter(self)
-            repeticiones = 0
-            try:
-                while True:
-                    elem = next(it1)
-                    if elem == elemento:
-                        repeticiones += 1
-            except StopIteration:
-                pass
-            return repeticiones
-        else:
-            return 0
+        repeticiones = 0
+        for libro in self.__datos[:self.__nd]:
+            if libro.titulo == elemento.titulo and libro.autor == elemento.autor and libro.ISBN == elemento.ISBN:  # Compara atributos relevantes
+                repeticiones += 1
+        return repeticiones
 
     def __encuentra(self, valor: T) -> int:
         """
