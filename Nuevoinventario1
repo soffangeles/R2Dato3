@@ -423,19 +423,15 @@ if __name__ == "__main__":
                         pags = input("Escribe número de páginas: ")
 
                 # Creamos una instancia de la clase Libro con la información proporcionada por el usuario.
-                libro = Libro(titulo, autor, genero, ISBN, publicacion1, editorial, edicion1, pags1)
-
-                # Usamos el método de repeticiones para saber cuántos ejemplares del libro con estas características existen.
-                if secuencia.repeticiones(libro) > 0:
-                    # Si hay ejemplares, muestra cuántos existen en la biblioteca.
-                    print("Hay un total de {} ejemplares que comparten las características buscadas".
-                          format(secuencia.repeticiones(libro)))
+                libro_buscado = Libro(titulo, autor, genero, ISBN, publicacion, editorial, edicion,
+                                      pags)  # Crear objeto Libro
+                repeticiones = secuencia.repeticiones(libro_buscado)  # Usar objeto Libro en la función repeticiones
+                if repeticiones > 0:
+                    print(f"Hay {repeticiones} ejemplares de '{libro_buscado.titulo}' en el inventario.")
                 else:
-                    # Si no hay ejemplares, muestra un mensaje indicando que no se encuentra ningún libro con esas características.
-                    print("No hay ningún libro con las características especificadas")
+                    print("No hay libros que cumplan con esas características.")
             else:
-                # Si el inventario está vacío, muestra un mensaje indicandolo
-                print("El inventario está vacío")
+                print("El inventario está vacío.")
 
         # Eliminar un elemento de la secuencia (todas las veces que aparece).
         elif opcion == "5":
