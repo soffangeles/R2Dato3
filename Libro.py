@@ -30,7 +30,7 @@ class Libro:
             self.__publicacion = params[4]
             self.__editorial = params[5]
             self.__edicion = int(params[6]) if int(params[6]) >= 1 else 1
-            self.__pags = params[7] if params[7] > 10 else 10
+            self.__pags = int(params[7]) if int(params[7]) > 10 else 10
 
     #Métodos GET
 
