@@ -68,27 +68,22 @@ class Secuencia(Secuenciable):
         Método que agrega un elemento a la sucesión.
         Si el arreglo está lleno, crea uno nuevo con el doble de capacidad
         y copia los elementos del arreglo anterior al nuevo.
-
         :param elemento: El elemento a agregar.
         """
-        try:
-            # Intenta agregar el elemento al arreglo actual.
-            self.__datos[self.__nd] = elemento
-            self.__nd += 1
-        except IndexError:
-            # Si el arreglo está lleno, crea uno nuevo con el doble de capacidad.
-            nuevo_datos = np.empty(len(self.__datos) * 2, dtype=L.Libro)
 
+        if self.__nd == len(self.__datos):
+            # Si el arreglo está lleno, crea uno nuevo con el doble de capacidad
+            nuevo_tamano = len(self.__datos) * 2
+            nuevo_datos = np.empty(nuevo_tamano, dtype=L.Libro)
             # Copia los elementos del arreglo anterior al nuevo.
             for i in range(self.__nd):
                 nuevo_datos[i] = self.__datos[i]
-
             # Actualiza la referencia al nuevo arreglo.
             self.__datos = nuevo_datos
 
-            # Agrega el elemento al nuevo arreglo.
-            self.__datos[self.__nd] = elemento
-            self.__nd += 1
+        # Agrega el elemento al arreglo
+        self.__datos[self.__nd] = elemento
+        self.__nd += 1
 
     def agregar2(self, elemento: T, nveces: int):
         """
@@ -97,14 +92,26 @@ class Secuencia(Secuenciable):
         :param elemento: El elemento a agregar
         :param nveces: Las veces que se va a agregar el elemento
         """
-        i = 0
-        try:
-            while i <= nveces-1:
-                self.__datos[self.__nd] = elemento
-                self.__nd += 1
-                i += 1
-        except StopIteration:
-            print("No es posible agregar un elemento!\n")
+
+        if nveces <= 0:
+            return
+
+        if self.__nd + nveces > len(self.__datos):
+            # Si no hay suficiente espacio, crea un nuevo arreglo
+            nuevo_tamano = len(self.__datos) * 2
+            while nuevo_tamano - self.__nd < nveces:
+                nuevo_tamano *= 2
+            nuevo_datos = np.empty(nuevo_tamano, dtype=L.Libro)
+            # Copia los elementos del arreglo anterior al nuevo.
+            for i in range(self.__nd):
+                nuevo_datos[i] = self.__datos[i]
+            # Actualiza la referencia al nuevo arreglo.
+            self.__datos = nuevo_datos
+
+        # Agrega los elementos al arreglo
+        for _ in range(nveces):
+            self.__datos[self.__nd] = elemento
+            self.__nd += 1
 
     def contiene(self, valor: T) -> bool:
         """
@@ -112,101 +119,88 @@ class Secuencia(Secuenciable):
         :param valor: El elemento a buscar
         :return: True si está contenido, False en caso contrario
         """
-        inicio = 0
-        fin = self.__nd - 1
-
-        while inicio <= fin:
-            medio = (inicio + fin) // 2
-
-            if self.__datos[medio] == valor:
-                return True  # Lo encontró
-            elif self.__datos[medio] < valor:
-                inicio = medio + 1
-            else:
-                fin = medio - 1
+        for elemento in self.__datos[:self.__nd]:
+            if elemento == valor:
+                return True
         return False
 
     def repeticiones(self, elemento: T) -> int:
-        """
-        Método que nos indica el número de veces que se repite un elemento dentro de la sucesión
-        :param elemento: El elemento a buscar
-        :return: El número de veces que se repite
-        """
-        if self.contiene(elemento):
-            it1 = iter(self)
-            repeticiones = 0
-            try:
-                while True:
-                    elem = next(it1)
-                    if elem == elemento:
-                        repeticiones += 1
-            except StopIteration:
-                pass
-            return repeticiones
-        else:
-            return 0
+        repeticiones = 0
+        for libro in self.__datos[:self.__nd]:
+            if libro.titulo == elemento.titulo and libro.autor == elemento.autor and libro.ISBN == elemento.ISBN:  # Compara atributos relevantes
+                repeticiones += 1
+        return repeticiones
 
-    def __encuentra(self, valor: T) -> None:
+    def __encuentra(self, valor: T) -> int:
         """
         Método que nos dice la posición que ocupa un elemento en particular dentro de la secuencia
         :param valor: El elemento a decir su posición
-        :return: La posición en la que se encuentra
+        :return: La posición en la que se encuentra, None si no se encuentra
         """
-        inicio = 0
-        fin = self.__nd - 1
+        # Verificar si la secuencia está ordenada (puedes agregar una bandera o método para esto)
+        ordenada = False # Asumiendo que no está ordenada por defecto
 
-        while inicio <= fin:
-            medio = (inicio + fin) // 2
+        if ordenada:
+            # Búsqueda binaria si la secuencia está ordenada
+            inicio = 0
+            fin = self.__nd - 1
 
-            if self.__datos[medio] == valor:
-                return medio  # Lo encontró
-            elif self.__datos[medio] < valor:
-                inicio = medio + 1
-            else:
-                fin = medio - 1
-        return None
+            while inicio <= fin:
+                medio = (inicio + fin) // 2
+
+                if self.__datos[medio] == valor:
+                    return medio  # Lo encontró
+                elif self.__datos[medio] < valor:
+                    inicio = medio + 1
+                else:
+                    fin = medio - 1
+        else:
+            # Búsqueda lineal si la secuencia no está ordenada
+            for i in range(self.__nd):
+                if self.__datos[i] == valor:
+                    return i
+
+        return None # No se encontró el elemento
 
     def eliminar1(self, elemento: T):
         """
-        Método que permite eliminar de la secuencia todas las veces que aparezca un elemento
+        Método que permite eliminar de la secuencia todas las veces que aparezca un elemento.
         :param elemento: El elemento a eliminar
         """
-        if self.contiene(elemento):
-            while self.contiene(elemento):
-                pos=self.__encuentra(elemento)
-                if pos is not None and pos < self.__nd:
-                    for i in range(pos, self.__nd - 1):
-                        self.__datos[i] = self.__datos[i + 1]
-                    self.__nd -= 1
-        else:
+        indices_a_eliminar = []  # Lista para almacenar los índices de los elementos a eliminar
+
+        for i in range(self.__nd):
+            # Compara atributos relevantes en lugar de objetos
+            if self.__datos[i].titulo == elemento.titulo and self.__datos[i].autor == elemento.autor and self.__datos[
+                i].ISBN == elemento.ISBN:
+                indices_a_eliminar.append(i)  # Agregar el índice a la lista
+
+        # Eliminar los elementos utilizando los índices en orden inverso
+        for indice in reversed(indices_a_eliminar):
+            self.__datos = np.delete(self.__datos, indice)  # Eliminar el elemento
+            self.__nd -= 1  # Decrementar el número de elementos
+
+        if not indices_a_eliminar:  # Si no se encontraron elementos para eliminar
             print("El elemento no se encuentra en la secuencia\n")
 
-    def eliminar2(self, elemento: T, nrep: int):
-        """
-        Método que permite eliminar un número dado de apariciones de algún elemento
-        :param elemento: El elemento a eliminar
-        :param nrep: El número total de apariciones del elementoque se van a eliminar
-        """
-        if nrep<=self.repeticiones(elemento):
-            it1=iter(self)
-            i=0
-            try:
-                while i<=nrep-1:
-                    pos = self.__encuentra(elemento)
-                    if pos == self.__nd:
-                        self.__nd -= 1
-                        i+=1
-                        continue
-                    elif pos != self.__nd and type(pos) == int:
-                        self.__datos[self.__nd], self.__datos[i] = self.__datos[i], self.__datos[self.__nd]
-                        i+=1
-                        continue
-                    else:
-                        break
-            except StopIteration:
-                pass
-        else:
-            print(f"El elemento no se encuentre en la secuencia al menos {nrep} veces\n")
+    def eliminar_libro(self, elemento: T):
+        if self.contiene(elemento):
+            pos = self.__encuentra(elemento)
+            if pos is not None:
+                # Desplazar los elementos a la izquierda para eliminar el elemento
+                for i in range(pos, self.__nd - 1):
+                    self.__datos[i] = self.__datos[i + 1]
+                self.__nd -= 1
+                self.__datos[self.__nd] = None  # Opcional: marcar la posición como vacía
+
+    def eliminar2(self, elemento: T, nveces: int):
+        if not self.contiene(elemento) or nveces <= 0:
+            return
+
+        eliminados = 0
+        while eliminados < nveces and self.contiene(elemento):
+            self.eliminar_libro(elemento)
+            eliminados += 1
 
     def esta_vacia(self) -> bool:
         """
