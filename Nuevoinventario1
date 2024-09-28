@@ -106,7 +106,7 @@ if __name__ == "__main__":
         table.add_row("13", "Leer inventario desde archivo CSV.")
         table.add_row("14", "Verificar si dos libros son iguales.")
         table.add_row("15", "Imprimir la ficha bibliográfica de un libro.")
-        table.add_row("16", "Guardar inventario agregado al programa en un archivo .csv.")
+        table.add_row("16", "Guardar inventario agregado al programa en un archivo.")
         table.add_row("17", "Salir.")
 
         console.print(Panel(table, title="Menú"))
@@ -525,22 +525,18 @@ if __name__ == "__main__":
                 libro = Libro(titulo, autor, genero, ISBN, publicacion, editorial, edicion, pags)
 
                 # Solicita el número de ejemplares a eliminar y valida que sea un entero positivo
+
                 while True:
                     try:
-                        ejemplar = int(input("Ingresa el número de ejemplares que quieres eliminar: "))
-                        if ejemplar <= 0:
+                        nveces = int(input("Ingresa el número de veces que quieres eliminar el libro: "))
+                        if nveces <= 0:
                             raise ValueError
                         break
                     except ValueError:
-                        print("Ingresa un valor entero positivo para el número de ejemplares a eliminar")
+                        print("Ingresa un valor entero positivo para el número de veces a eliminar")
 
-                # Elimina los ejemplares del inventario (utilizando el nuevo eliminar2 con iteradores)
-                secuencia.eliminar2(libro, ejemplar)
-
-                # Muestra un mensaje de confirmación
-                print(f"Se han eliminado {ejemplar} copias de {libro.titulo} de la biblioteca")
-            else:
-                print("El inventario está vacío. No se puede eliminar ningún libro.\n")
+                secuencia.eliminar2(libro, nveces)
+                print(f"Se han eliminado {nveces} copias de {libro.titulo} de la biblioteca")
 
         # Verificar si el inventario está vacío.
         elif opcion == "7":
@@ -723,7 +719,8 @@ if __name__ == "__main__":
 
         # Crea un archivo de tipo .csv con todos los libros agregados durante la ejecución del programa.
         elif opcion == "16":
-            nombre_archivo = input("Introduce el nombre del archivo CSV para guardar el inventario: ")
+            nombre_archivo = input("Introduce el nombre del archivo para guardar el inventario (solo nombre para "
+                                   "texto o agregue .csv para archivo tipo .csv): ")
             secuencia.guardar_en_csv(nombre_archivo)
             print(f"Inventario guardado en {nombre_archivo}")
 
