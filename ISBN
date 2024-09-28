@@ -1,0 +1,76 @@
+def leer_archivo(archivo_csv: str, inventario: Secuencia):
+    """
+    Lee un archivo CSV que contiene información de libros y los agrega al inventario.
+    Permite corregir el ISBN si es inválido.
+
+    Args:
+        archivo_csv (str): La ruta al archivo CSV.
+        inventario (Secuencia): El inventario donde se agregarán los libros.
+    """
+    try:
+        with open(archivo_csv, newline='', encoding='utf-8') as archivo_csv:
+            lector = csv.reader(archivo_csv)
+            iterador = iter(lector)
+            next(iterador)  # Saltar la cabecera
+            while True:
+                try:
+                    fila = next(iterador)
+                    titulo = fila[0]
+                    autor = fila[1]
+                    genero = fila[2]
+                    ISBN = fila[3]
+                    publicacion = fila[4]
+                    editorial = fila[5]
+                    edicion = int(fila[6])
+                    pags = int(fila[7])
+
+                    # Validar el ISBN
+                    while True:  # Bucle para corregir el ISBN de la fila actual
+                        if len(ISBN) != 13 or not ISBN.replace("-", "").isdigit() or (ISBN[:3] != "978" and ISBN[:3] != "979"):
+                            print(f"Error: El ISBN no es válido: {ISBN}")
+                            print(f"Datos del libro con ISBN inválido: \n"
+                                  f"Título: {titulo} | Autor: {autor} | Género: {genero} |"
+                                  f"Año de publicación: {fila[4]} | Editorial: {fila[5]} |"
+                                  f"Número de edición: {fila[6]} | Número de páginas: {fila[7]}")
+
+                            # Límite de intentos para corregir el ISBN
+                            intentos = 3
+                            while intentos > 0:
+                                nuevo_ISBN = input("Introduce el ISBN correcto (13 dígitos, comienza con 978 o 979): ")
+                                if len(nuevo_ISBN) == 13 and nuevo_ISBN.replace("-", "").isdigit() and (nuevo_ISBN[:3] == "978" or nuevo_ISBN[:3] == "979"):
+                                    ISBN = nuevo_ISBN
+                                    break  # Sale del bucle si el ISBN es válido
+                                else:
+                                    intentos -= 1
+                                    print(f"El ISBN sigue siendo incorrecto. Te quedan {intentos} intentos.")
+
+                            # Si se agotaron los intentos, dar la opción de salir
+                            if intentos == 0:
+                                if input("¿Deseas salir de la opción de leer archivo? (s/n): ").lower() == 's':
+                                    return  # Sale de la función leer_archivo
+                                else:
+                                    continue  # Vuelve a pedir el ISBN para la misma fila
+                        else:
+                            break  # El ISBN es válido, sale del bucle de corrección
+
+                    # Crear el objeto Libro y agregarlo al inventario
+                    libro = Libro(titulo, autor, genero, ISBN, publicacion, editorial, edicion, pags)
+                    inventario.agregar1(libro)
+
+                except StopIteration:
+                    break
+
+                except IndexError:
+                    print(f"Error: La fila no tiene suficientes elementos: {fila}")
+
+    except FileNotFoundError:
+        print(f"Error: No se encontró el archivo {archivo_csv}")
+    except Exception as e:
+        print(f"Ocurrió un error inesperado: {e}")
+
+
+------------------------------------------------------------------------------------------------------------------
+
+        elif opcion == "13":
+            nombre_archivo = input("Introduce el nombre del archivo CSV: ")
+            leer_archivo(nombre_archivo, secuencia)  # Llama a la función modificada
