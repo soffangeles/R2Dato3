@@ -167,15 +167,20 @@ class Secuencia(Secuenciable):
         Método que permite eliminar de la secuencia todas las veces que aparezca un elemento.
         :param elemento: El elemento a eliminar
         """
-        if self.contiene(elemento):
-            while self.contiene(elemento):
-                pos = self.__encuentra(elemento)
-                if pos is not None and pos < self.__nd:
-                    # Intercambia el elemento con el último elemento
-                    self.__datos[pos], self.__datos[self.__nd - 1] = self.__datos[self.__nd - 1], self.__datos[pos]
-                    # Elimina el último elemento
-                    self.__nd -= 1
-        else:
+        indices_a_eliminar = []  # Lista para almacenar los índices de los elementos a eliminar
+
+        for i in range(self.__nd):
+            # Compara atributos relevantes en lugar de objetos
+            if self.__datos[i].titulo == elemento.titulo and self.__datos[i].autor == elemento.autor and self.__datos[
+                i].ISBN == elemento.ISBN:
+                indices_a_eliminar.append(i)  # Agregar el índice a la lista
+
+        # Eliminar los elementos utilizando los índices en orden inverso
+        for indice in reversed(indices_a_eliminar):
+            self.__datos = np.delete(self.__datos, indice)  # Eliminar el elemento
+            self.__nd -= 1  # Decrementar el número de elementos
+
+        if not indices_a_eliminar:  # Si no se encontraron elementos para eliminar
             print("El elemento no se encuentra en la secuencia\n")
 
     def eliminar_libro(self, elemento: T):
@@ -189,13 +194,30 @@ class Secuencia(Secuenciable):
                 self.__datos[self.__nd] = None  # Opcional: marcar la posición como vacía
 
     def eliminar2(self, elemento: T, nveces: int):
-        if not self.contiene(elemento) or nveces <= 0:
+        """
+        Método que permite eliminar el número de repeticiones del elemento dentro
+        de la Secuencia, indicadas por nrep, siempre que esto sea posible.
+        Si el elemento no aparece al menos las repeticiones indicadas por nrep,
+        no hace nada.
+        :param elemento: El elemento a eliminar
+        :param nveces: Número de veces a eliminar el elemento
+        """
+        if nveces <= 0:
             return
 
-        eliminados = 0
-        while eliminados < nveces and self.contiene(elemento):
-            self.eliminar_libro(elemento)
-            eliminados += 1
+        indices_a_eliminar = []
+        for i in range(self.__nd):
+            if (self.__datos[i].titulo == elemento.titulo and
+                    self.__datos[i].autor == elemento.autor and
+                    self.__datos[i].ISBN == elemento.ISBN):
+                indices_a_eliminar.append(i)
+                if len(indices_a_eliminar) == nveces:
+                    break
+
+        # Eliminar los elementos por los índices encontrados, de atrás hacia adelante
+        for indice in reversed(indices_a_eliminar):
+            self.__datos = np.delete(self.__datos, indice)
+            self.__nd -= 1
 
     def esta_vacia(self) -> bool:
         """
